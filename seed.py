@@ -119,7 +119,7 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    # load_users()
-    # load_movies()
-    # load_ratings()
-    # set_val_user_id()
+    load_users()
+    load_movies()
+    load_ratings()
+    set_val_user_id()
