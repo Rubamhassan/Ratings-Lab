@@ -25,6 +25,31 @@ def index():
 
     return render_template("homepage.html")
 
+@app.route('/register', methods=["GET"])
+def register():
+    """ take us to register_form page"""
+
+    return render_template("register_form.html")
+
+@app.route("/register", methods=["POST"])
+def register_form():
+    """ take us to register_form page"""
+
+    emailaddress= request.form.get('emailaddress')
+    password= request.form.get('password')
+
+    user=User.query.filter_by(email=emailaddress).first()
+    if user==None:
+        user = User(email=emailaddress,
+                    password=password)
+        #We may need to move line 47 one tab to the left
+        db.session.add(user)
+        db.session.commit()
+
+       # else (user is in database)
+    #     Need to check password
+
+    return render_template("register_form.html")
 
 @app.route('/users')
 def user_list():
