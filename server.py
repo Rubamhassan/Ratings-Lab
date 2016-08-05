@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import (Flask, render_template, redirect, request, flash, session)
+from flask import (Flask, url_for, render_template, redirect, request, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import (User, Rating, Movie, connect_to_db, db)
@@ -39,17 +39,22 @@ def register_form():
     password= request.form.get('password')
 
     user=User.query.filter_by(email=emailaddress).first()
-    if user==None:
+   
+    if not user:
         user = User(email=emailaddress,
                     password=password)
-        #We may need to move line 47 one tab to the left
-        db.session.add(user)
+        
+        db.session.add(user) 
         db.session.commit()
+        flash("Account created.")
+        return redirect('/')
 
-       # else (user is in database)
-    #     Need to check password
+    if user.password != password:
+        flash("Incorrect password.")
+        return redirect(url_for("register_form"))
 
-    return render_template("register_form.html")
+    flash("Logged in.")
+    return redirect('/')
 
 @app.route('/users')
 def user_list():
@@ -57,6 +62,19 @@ def user_list():
 
     users = User.query.all()
     return render_template("user_list.html", users=users)
+
+@app.route('/user_details/<user_id>')
+def user_details(user_id):
+    """ show users rated movies """
+    
+    user = User.query.get(user_id)
+    ratings = Rating.query.filter_by(user_id=user.user_id).all()
+    
+    return render_template("user_details.html", user=user, ratings=ratings)
+
+#From rating grab every movie title and rating for that user
+
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
